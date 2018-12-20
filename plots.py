@@ -3,7 +3,7 @@ from azure.storage.blob import BlockBlobService
 import numpy as np
 import collections
 import time
-import pandas
+import pandas, math
 from collections import defaultdict, OrderedDict
 import matplotlib.pyplot as plt
 from operator import itemgetter
@@ -28,7 +28,7 @@ def bit_fill(pin, pinCount):
     else:
         return False
 
-
+        
 def drawPins(endingPinCount, index, value, g):
     # xy pairs for pins on figure
     pinxy = [(570, 200), (405, 300), (725, 300), (240, 400), (570, 400),
@@ -42,24 +42,26 @@ def drawPins(endingPinCount, index, value, g):
     ax.cla()
     ax.set_xlim(20, 1310)
     ax.set_ylim(0, 800)
+    offset = math.tan(math.radians(g.iloc[1][4]))*400
+
     # plot ball path on figure
-    ax.plot([round(g.iloc[1][4],0),round(g.iloc[1][4]+2,0)],[0,400],'--')
+    ax.plot([round(g.iloc[5][5],0),round(g.iloc[5][5]+offset,0)],[0,400],'--')
     # plot x location of ball.  Size is +- one standard deviation
-    ax.scatter(round(g.iloc[1][4],0),0,s=2*round(g.iloc[2][4],0))
+    ax.scatter(round(g.iloc[5][5],10),0,s=2*round(g.iloc[2][5],0))
     # create table and entries
     #format of grouped.describe() 'g' - use g.iloc[row][col]
-    #         epc          v1          v2      theta           x
-    # count  39.0   39.000000   35.000000  35.000000   39.000000
-    # mean   32.0  140.733184  118.778189  -0.056169  591.538462
-    # std     0.0   45.883051   28.093312   0.222245   88.924523
-    # min    32.0   10.440307    9.848858  -0.274910  452.000000
-    # 25%    32.0  118.432796  108.754121  -0.151138  501.000000
-    # 50%    32.0  149.214610  122.331517  -0.070803  634.000000
-    # 75%    32.0  175.676504  136.434460  -0.047601  645.000000
-    # max    32.0  213.527516  148.013513   1.152572  885.000000
-    cells =[[int(g.iloc[1][4]),int(g.iloc[1][1]),int(g.iloc[1][2]),round(g.iloc[1][3],2)],
-            ['1','1','1','1'],  #TODO for median
-            [round(g.iloc[2][4],0),round(g.iloc[2][1],0),round(g.iloc[2][2],0),round(g.iloc[2][3],2)]]
+#         epc    up          v1          v2      theta           x
+# count  26.0  26.0   26.000000   24.000000  24.000000   26.000000
+# mean   34.0   2.0  106.030165   99.925651  -0.202594  480.807692
+# std     0.0   0.0   58.651754   36.679423   0.072973   24.475325
+# min    34.0   2.0   24.186773   28.635642  -0.432408  422.000000
+# 25%    34.0   2.0   64.666386   79.092310  -0.246447  468.000000
+# 50%    34.0   2.0   90.753119  106.806569  -0.197396  477.500000  ** -median
+# 75%    34.0   2.0  155.536869  121.763162  -0.158413  500.250000
+# max    34.0   2.0  217.671771  165.169610  -0.077967  517.000000
+    cells =[[int(g.iloc[1][5]),int(g.iloc[1][2]),int(g.iloc[1][3]),round(g.iloc[1][4],2)],              #Row 1
+            [round(g.iloc[5][5],0),round(g.iloc[5][2],0),round(g.iloc[5][3],0),round(g.iloc[5][4],2)],  #Row 5
+            [round(g.iloc[2][5],0),round(g.iloc[2][2],0),round(g.iloc[2][3],0),round(g.iloc[2][4],2)]]  #Row 2
     cols = ['x', 'v1','v2',r'$\theta$' ]
     rows = ['mean', 'median',r'$\sigma$' ]
     # plot filled/unfilled pin circles, title, table, and population on figure
@@ -86,14 +88,17 @@ def arrangeDict(d,type):
         for r in d_sorted_keys:
             arranged[r] = d[r]
         return arranged
+    if type == 'Up':
+        #TODO
+        return d    
 
 
 # Get CSV data fro Blob storage - Persist in this directory with same name as in Blob Storage
-# block_blob_service = BlockBlobService(
-#     account_name=account_name, account_key=account_key)
-# block_blob_service.get_blob_to_path(container_name, file_name, file_name)
-file_name = 'small.csv'
-file_name = 'results01.csv'
+block_blob_service = BlockBlobService(
+    account_name=account_name, account_key=account_key)
+block_blob_service.get_blob_to_path(container_name, file_name, file_name)
+# file_name = 'small.csv'
+# file_name = 'results01.csv'
 # endingPinCount, v1, v2, angle2, x = np.loadtxt(
 #     file_name, delimiter=',', unpack=True, usecols=range(5))
 # endingPinCount, v1, v2, angle2, x = np.genfromtxt(
