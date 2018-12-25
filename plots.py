@@ -80,7 +80,7 @@ def drawPins(endingPinCount, index, value, g):
 
 #  Sorts the data dictionary by desired order
 #  type = 'Count' sorts by most frequent
-#  type = 'Downed' sorts by best result
+#  type = 'Up' sorts by best result
 def arrangeDict(d,type):
     if type == 'Count' or type == '':
         # type = result
@@ -118,7 +118,7 @@ for (key, value) in sorted(arrangeDict(ecDict,'Count').items(), key=itemgetter(1
     if index%4 ==0:
         plt.tight_layout(pad=4.0, w_pad=0.5, h_pad=6.0)
         plt.figure(index/4 +1)
-        plt.suptitle(time.strftime('%b %d %Y'))
+        plt.suptitle('Page '+str(index//4+1) +'  '+time.strftime('%b %d %Y'))
     if index > 19:
         continue
     endcountGroup = result.loc[result['epc'] == key]
