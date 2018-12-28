@@ -94,7 +94,7 @@ def arrangeDict(d,type):
         return d    
 
 
-# Get CSV data fro Blob storage - Persist in this directory with same name as in Blob Storage
+# Get CSV data from Blob storage - Persist in this directory with same name as in Blob Storage
 block_blob_service = BlockBlobService(
     account_name=account_name, account_key=account_key)
 block_blob_service.get_blob_to_path(container_name, file_name, file_name)
